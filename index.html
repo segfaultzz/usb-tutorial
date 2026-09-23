@@ -1,0 +1,1322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A beginner friendly, visual course for learning USB protocol and stack from zero.">
+  <title>USB From Zero</title>
+  <style>
+:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surfaceSoft: #eef3ff;
+  --surfaceMuted: #f0f2f6;
+  --text: #13213c;
+  --muted: #5e6a80;
+  --border: #dce3ef;
+  --accent: #315be8;
+  --accentStrong: #173bb8;
+  --accentSoft: #e8edff;
+  --good: #167a5a;
+  --warn: #b46408;
+  --danger: #b93644;
+  --code: #101828;
+  --shadow: 0 16px 45px rgba(43, 63, 110, 0.08);
+  --radius: 22px;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1320;
+  --surface: #151d2c;
+  --surfaceSoft: #1b2942;
+  --surfaceMuted: #1b2332;
+  --text: #edf2ff;
+  --muted: #a8b4c8;
+  --border: #2b374a;
+  --accent: #86a4ff;
+  --accentStrong: #b4c6ff;
+  --accentSoft: #202f55;
+  --good: #63d4ab;
+  --warn: #ffc269;
+  --danger: #ff8793;
+  --code: #0a0f18;
+  --shadow: 0 16px 45px rgba(0,0,0,0.18);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.68;
+}
+button, input { font: inherit; }
+a { color: var(--accentStrong); }
+svg { width: 100%; height: auto; }
+
+.appShell { min-height: 100vh; }
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 300px;
+  padding: 22px 18px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 50;
+}
+.brandRow { display: flex; gap: 12px; align-items: center; margin-bottom: 22px; }
+.usbMark {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+.brandTitle { font-weight: 850; }
+.brandSub { color: var(--muted); font-size: .82rem; }
+.searchBox { display: grid; gap: 7px; color: var(--muted); font-size: .82rem; margin-bottom: 18px; }
+.searchBox input, .glossarySearch {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+}
+.searchBox input:focus, .glossarySearch:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accentSoft); }
+.progressWrap { padding: 14px; border: 1px solid var(--border); border-radius: 14px; margin-bottom: 18px; }
+.progressTop { display: flex; justify-content: space-between; font-size: .83rem; margin-bottom: 8px; }
+.progressTrack { height: 7px; background: var(--surfaceMuted); border-radius: 99px; overflow: hidden; }
+.progressFill { height: 100%; width: 0%; background: var(--accent); transition: width .25s ease; }
+.lessonNav { display: grid; gap: 4px; }
+.navGroup { margin-top: 15px; padding: 0 8px; color: var(--muted); font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.navLink {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: .88rem;
+}
+.navLink:hover, .navLink.active { background: var(--accentSoft); color: var(--text); }
+.navDot { width: 9px; height: 9px; border-radius: 99px; border: 2px solid var(--border); flex: none; }
+.navLink.done .navDot { border-color: var(--good); background: var(--good); }
+.sidebarFooter { display: grid; gap: 9px; margin-top: 20px; }
+.full { width: 100%; }
+
+.mainContent { margin-left: 300px; padding: 38px clamp(22px, 4vw, 72px) 80px; max-width: 1700px; }
+.mobileBar { display: none; }
+.hero { display: grid; grid-template-columns: minmax(0, .86fr) minmax(460px, 1.14fr); gap: 34px; align-items: center; margin-bottom: 24px; }
+.heroText h1 { font-size: clamp(2.35rem, 5vw, 4.9rem); line-height: .98; letter-spacing: -.045em; max-width: 850px; margin: 10px 0 22px; }
+.heroText p { color: var(--muted); font-size: 1.08rem; max-width: 760px; }
+.eyebrow, .sectionKicker, .lessonNumber { color: var(--accentStrong); font-size: .76rem; font-weight: 850; letter-spacing: .09em; }
+.heroActions { display: flex; gap: 10px; flex-wrap: wrap; margin: 24px 0; }
+.primaryButton, .secondaryButton, .choiceButton, .completeButton, .stepButton {
+  border-radius: 11px;
+  padding: 10px 15px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-weight: 750;
+}
+.primaryButton { color: white; background: var(--accent); }
+.secondaryButton { color: var(--text); background: var(--surface); border-color: var(--border); }
+.primaryButton:hover { filter: brightness(.96); }
+.secondaryButton:hover { background: var(--surfaceMuted); }
+.heroFacts { display: flex; gap: 9px; flex-wrap: wrap; }
+.heroFacts span { padding: 6px 10px; border-radius: 99px; background: var(--surfaceMuted); color: var(--muted); font-size: .82rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.soft { background: linear-gradient(145deg, var(--surface), var(--surfaceSoft)); }
+.heroDiagram { padding: 16px; }
+.diagramTitle { font-weight: 800; padding: 8px 8px 0; }
+.learningMap { padding: 28px; margin: 26px 0 32px; }
+.learningMap h2 { margin: 4px 0 20px; font-size: clamp(1.55rem, 2.5vw, 2.3rem); }
+.roadmapGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.roadmapGrid div { border: 1px solid var(--border); border-radius: 14px; padding: 15px; background: var(--bg); }
+.roadmapGrid b { display: block; margin-bottom: 3px; }
+.roadmapGrid span { display: block; color: var(--muted); font-size: .9rem; }
+
+.lesson { padding: clamp(22px, 4vw, 46px); margin: 22px 0; scroll-margin-top: 22px; }
+.lesson.hiddenBySearch { display: none; }
+.lessonHeader { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.lesson h2 { font-size: clamp(1.65rem, 3vw, 2.55rem); line-height: 1.1; margin: 4px 0 0; letter-spacing: -.025em; }
+.lesson h3 { font-size: 1.22rem; margin: 28px 0 8px; }
+.lesson p { color: var(--muted); max-width: 980px; }
+.lesson strong, .lesson b { color: var(--text); }
+.completeButton { background: var(--accentSoft); color: var(--accentStrong); white-space: nowrap; }
+.completeButton.done { background: rgba(22,122,90,.13); color: var(--good); }
+.ideaBox, .warningBox, .rememberBox, .labBox {
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 18px 0;
+}
+.ideaBox { background: var(--accentSoft); border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border)); }
+.warningBox { background: color-mix(in srgb, var(--warn) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--border)); }
+.rememberBox { background: color-mix(in srgb, var(--good) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--good) 28%, var(--border)); }
+.labBox { background: var(--bg); border: 1px solid var(--border); }
+.calloutTitle { font-size: .78rem; font-weight: 850; letter-spacing: .08em; margin-bottom: 4px; }
+.twoCol, .threeCol, .fourCol { display: grid; gap: 14px; margin: 16px 0; }
+.twoCol { grid-template-columns: repeat(2, 1fr); }
+.threeCol { grid-template-columns: repeat(3, 1fr); }
+.fourCol { grid-template-columns: repeat(4, 1fr); }
+.miniCard { border: 1px solid var(--border); border-radius: 14px; padding: 16px; background: var(--bg); }
+.miniCard h3, .miniCard h4 { margin: 0 0 5px; }
+.miniCard p { margin: 0; font-size: .9rem; }
+.term { color: var(--accentStrong); font-weight: 800; }
+.diagram { border: 1px solid var(--border); border-radius: 16px; padding: 16px; background: var(--bg); margin: 18px 0; overflow-x: auto; }
+.diagram figcaption { color: var(--muted); font-size: .85rem; margin-top: 10px; }
+.stackDiagram { display: grid; grid-template-columns: 1fr 90px 1fr; gap: 10px; align-items: center; }
+.stackCol { display: grid; gap: 9px; }
+.stackLayer { border: 1px solid var(--border); border-radius: 12px; padding: 11px 12px; background: var(--surface); text-align: center; font-weight: 700; }
+.stackLayer.accent { background: var(--accentSoft); color: var(--accentStrong); }
+.busLine { height: 5px; border-radius: 99px; background: var(--accent); position: relative; }
+.busLine::before, .busLine::after { content: ""; position: absolute; width: 12px; height: 12px; border-top: 3px solid var(--accent); border-right: 3px solid var(--accent); top: -5px; }
+.busLine::before { left: -1px; transform: rotate(225deg); }
+.busLine::after { right: -1px; transform: rotate(45deg); }
+
+.tableWrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; margin: 16px 0; }
+table { width: 100%; border-collapse: collapse; min-width: 680px; }
+th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+th { background: var(--surfaceMuted); font-size: .82rem; }
+td { color: var(--muted); font-size: .9rem; }
+tr:last-child td { border-bottom: 0; }
+.codeBlock { background: var(--code); color: #dbe5ff; padding: 16px; border-radius: 14px; overflow-x: auto; font: .88rem/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
+.byteRow { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
+.byte { min-width: 46px; text-align: center; border: 1px solid var(--border); border-radius: 9px; padding: 8px; background: var(--surface); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.byte span { display: block; font-size: .68rem; color: var(--muted); font-family: inherit; }
+.flowRow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 14px 0; }
+.flowBox { padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font-weight: 700; }
+.flowArrow { color: var(--accentStrong); font-weight: 900; }
+
+.svgBox { fill: var(--surface); stroke: var(--border); stroke-width: 2; }
+.svgBox.accent { fill: var(--accentSoft); stroke: var(--accent); }
+.svgCable { fill: var(--surfaceMuted); stroke: var(--border); stroke-width: 2; }
+.svgText { fill: var(--text); font: 15px system-ui, sans-serif; }
+.svgText.strong { font-weight: 800; }
+.svgText.small { font-size: 12px; fill: var(--muted); }
+.svgLine { stroke: var(--accent); stroke-width: 3; fill: none; }
+.svgArrow { fill: var(--accent); }
+.svgMuted { stroke: var(--border); fill: none; stroke-width: 2; }
+
+.packetBar { display: grid; grid-template-columns: 1.1fr .8fr 1.2fr 2.4fr 1fr .8fr; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin: 14px 0; min-width: 700px; }
+.packetBar > div { padding: 12px 8px; text-align: center; border-right: 1px solid var(--border); background: var(--surface); }
+.packetBar > div:nth-child(even) { background: var(--accentSoft); }
+.packetBar > div:last-child { border-right: 0; }
+.packetBar small { display: block; color: var(--muted); }
+.endpointGrid { display: grid; grid-template-columns: 120px 1fr 120px; gap: 12px; align-items: center; }
+.endpointCenter { text-align: center; border: 2px solid var(--accent); background: var(--accentSoft); border-radius: 16px; padding: 20px; font-weight: 850; }
+.endpointSide { display: grid; gap: 8px; }
+.endpointPill { border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 9px; text-align: center; font-size: .84rem; }
+.timeline { display: grid; gap: 9px; margin: 16px 0; }
+.timelineStep { display: grid; grid-template-columns: 45px 1fr; gap: 12px; align-items: start; }
+.timelineIndex { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--accentSoft); color: var(--accentStrong); font-weight: 850; }
+.timelineBody { border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px; background: var(--bg); }
+.timelineBody b { display: block; }
+.timelineBody span { color: var(--muted); font-size: .9rem; }
+
+.enumStage { border: 1px solid var(--border); border-radius: 14px; padding: 18px; background: var(--surface); margin-top: 12px; }
+.enumMeta { color: var(--accentStrong); font-weight: 850; font-size: .78rem; letter-spacing: .07em; }
+.enumStage h4 { font-size: 1.25rem; margin: 5px 0 7px; }
+.enumStage p { margin: 0; }
+.stepControls { display: flex; gap: 8px; margin-top: 12px; }
+.stepButton { background: var(--accent); color: white; }
+.stepButton.secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+
+.requestBuilder { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.requestBuilder label { display: grid; gap: 6px; color: var(--muted); font-size: .82rem; }
+.requestBuilder select { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); padding: 9px; }
+.resultBox { margin-top: 12px; padding: 12px 14px; background: var(--code); color: #e8eeff; border-radius: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.quizQuestion { border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin: 12px 0; }
+.quizQuestion h4 { margin: 0 0 12px; }
+.choices { display: grid; gap: 8px; }
+.choiceButton { text-align: left; background: var(--bg); color: var(--text); border-color: var(--border); }
+.choiceButton.correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 10%, var(--surface)); }
+.choiceButton.wrong { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, var(--surface)); }
+.quizFeedback { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+
+.glossarySearch { max-width: 480px; margin: 5px 0 18px; }
+.glossaryGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.glossaryItem { border: 1px solid var(--border); border-radius: 12px; padding: 13px; background: var(--bg); }
+.glossaryItem b { display: block; margin-bottom: 3px; }
+.glossaryItem span { color: var(--muted); font-size: .88rem; }
+.sourceGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sourceGrid a { display: grid; text-decoration: none; border: 1px solid var(--border); border-radius: 13px; padding: 15px; background: var(--bg); color: var(--text); }
+.sourceGrid span { color: var(--muted); font-size: .84rem; }
+.sourceGrid a:hover { border-color: var(--accent); }
+footer { color: var(--muted); text-align: center; padding: 26px 10px 0; font-size: .86rem; }
+
+@media (max-width: 1180px) {
+  .hero { grid-template-columns: 1fr; }
+  .heroDiagram { max-width: 900px; }
+  .roadmapGrid, .glossaryGrid, .sourceGrid { grid-template-columns: repeat(2, 1fr); }
+  .fourCol { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-102%); transition: transform .2s ease; width: min(330px, 88vw); box-shadow: var(--shadow); }
+  .sidebar.open { transform: translateX(0); }
+  .mainContent { margin-left: 0; padding: 70px 18px 60px; }
+  .mobileBar { position: fixed; z-index: 40; top: 0; left: 0; right: 0; height: 56px; background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 13px; }
+  .iconButton { border: 1px solid var(--border); background: var(--surface); color: var(--text); width: 38px; height: 38px; border-radius: 10px; }
+  .roadmapGrid, .threeCol, .glossaryGrid, .sourceGrid { grid-template-columns: 1fr; }
+  .requestBuilder { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+  .lesson { padding: 20px 16px; }
+  .heroText h1 { font-size: 2.65rem; }
+  .twoCol, .fourCol { grid-template-columns: 1fr; }
+  .lessonHeader { display: grid; }
+  .completeButton { justify-self: start; }
+  .stackDiagram { grid-template-columns: 1fr; }
+  .busLine { width: 5px; height: 50px; justify-self: center; }
+  .busLine::before, .busLine::after { display: none; }
+  .endpointGrid { grid-template-columns: 1fr; }
+}
+@media print {
+  .sidebar, .mobileBar, .heroActions, .completeButton, .stepControls, .quizQuestion button { display: none !important; }
+  .mainContent { margin: 0; padding: 0; max-width: none; }
+  body { background: white; color: black; }
+  .card, .diagram { box-shadow: none; break-inside: avoid; }
+}
+
+</style>
+</head>
+<body>
+  <div class="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brandRow">
+        <div class="usbMark">USB</div>
+        <div>
+          <div class="brandTitle">USB From Zero</div>
+          <div class="brandSub">Protocol and stack course</div>
+        </div>
+      </div>
+
+      <label class="searchBox" aria-label="Search lessons">
+        <span>Search</span>
+        <input id="lessonSearch" type="search" placeholder="descriptor, endpoint, HID...">
+      </label>
+
+      <div class="progressWrap" aria-label="Course progress">
+        <div class="progressTop"><span>Course progress</span><strong id="progressText">0%</strong></div>
+        <div class="progressTrack"><div class="progressFill" id="progressFill"></div></div>
+      </div>
+
+      <nav id="lessonNav" class="lessonNav" aria-label="Course lessons"></nav>
+
+      <div class="sidebarFooter">
+        <button class="secondaryButton full" id="themeButton" type="button">Switch theme</button>
+        <button class="secondaryButton full" id="resetProgress" type="button">Reset progress</button>
+      </div>
+    </aside>
+
+    <main class="mainContent">
+      <div class="mobileBar">
+        <button class="iconButton" id="menuButton" type="button" aria-label="Open course navigation">☰</button>
+        <strong>USB From Zero</strong>
+        <button class="iconButton" id="mobileThemeButton" type="button" aria-label="Switch theme">◐</button>
+      </div>
+
+      <section class="hero" id="top">
+        <div class="heroText">
+          <span class="eyebrow">BEGINNER TO IMPLEMENTER</span>
+          <h1>Learn USB by seeing how every layer connects.</h1>
+          <p>This course starts with one cable and ends with the full protocol stack, enumeration, descriptors, endpoints, transfer types, packet flow, device classes, firmware architecture, USB 3 concepts, Type C, Power Delivery, and debugging.</p>
+          <div class="heroActions">
+            <button class="primaryButton" id="startButton" type="button">Start at lesson 1</button>
+            <button class="secondaryButton" id="continueButton" type="button">Continue learning</button>
+          </div>
+          <div class="heroFacts">
+            <span>32 lessons</span><span>visual diagrams</span><span>interactive labs</span><span>offline friendly</span>
+          </div>
+        </div>
+        <div class="heroDiagram card soft">
+          <div class="diagramTitle">The entire USB idea in one picture</div>
+          <svg viewBox="0 0 760 390" role="img" aria-label="USB overview from application to device function">
+            <defs>
+              <marker id="arrowHero" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" class="svgArrow"></path></marker>
+            </defs>
+            <rect x="24" y="34" width="160" height="58" rx="16" class="svgBox accent"></rect>
+            <text x="104" y="68" text-anchor="middle" class="svgText strong">Application</text>
+            <rect x="24" y="120" width="160" height="58" rx="16" class="svgBox"></rect>
+            <text x="104" y="154" text-anchor="middle" class="svgText">OS USB stack</text>
+            <rect x="24" y="206" width="160" height="58" rx="16" class="svgBox"></rect>
+            <text x="104" y="240" text-anchor="middle" class="svgText">Host controller</text>
+            <rect x="24" y="292" width="160" height="58" rx="16" class="svgBox"></rect>
+            <text x="104" y="326" text-anchor="middle" class="svgText">Host PHY</text>
+            <line x1="104" y1="92" x2="104" y2="116" class="svgLine" marker-end="url(#arrowHero)"></line>
+            <line x1="104" y1="178" x2="104" y2="202" class="svgLine" marker-end="url(#arrowHero)"></line>
+            <line x1="104" y1="264" x2="104" y2="288" class="svgLine" marker-end="url(#arrowHero)"></line>
+
+            <rect x="252" y="132" width="256" height="120" rx="28" class="svgCable"></rect>
+            <text x="380" y="180" text-anchor="middle" class="svgText strong">Cable and bus</text>
+            <text x="380" y="209" text-anchor="middle" class="svgText small">Host schedules every USB 2 transaction</text>
+            <text x="380" y="233" text-anchor="middle" class="svgText small">Packets move requests and data</text>
+            <line x1="185" y1="321" x2="252" y2="223" class="svgLine" marker-end="url(#arrowHero)"></line>
+
+            <rect x="576" y="292" width="160" height="58" rx="16" class="svgBox"></rect>
+            <text x="656" y="326" text-anchor="middle" class="svgText">Device PHY</text>
+            <rect x="576" y="206" width="160" height="58" rx="16" class="svgBox"></rect>
+            <text x="656" y="240" text-anchor="middle" class="svgText">Device controller</text>
+            <rect x="576" y="120" width="160" height="58" rx="16" class="svgBox"></rect>
+            <text x="656" y="154" text-anchor="middle" class="svgText">USB device stack</text>
+            <rect x="576" y="34" width="160" height="58" rx="16" class="svgBox accent"></rect>
+            <text x="656" y="68" text-anchor="middle" class="svgText strong">Device function</text>
+            <line x1="508" y1="223" x2="575" y2="321" class="svgLine" marker-end="url(#arrowHero)"></line>
+            <line x1="656" y1="292" x2="656" y2="268" class="svgLine" marker-end="url(#arrowHero)"></line>
+            <line x1="656" y1="206" x2="656" y2="182" class="svgLine" marker-end="url(#arrowHero)"></line>
+            <line x1="656" y1="120" x2="656" y2="96" class="svgLine" marker-end="url(#arrowHero)"></line>
+          </svg>
+        </div>
+      </section>
+
+      <section class="learningMap card" id="learningMap">
+        <div>
+          <span class="sectionKicker">YOUR ROADMAP</span>
+          <h2>What you will be able to explain after this course</h2>
+        </div>
+        <div class="roadmapGrid">
+          <div><b>Physical</b><span>Wires, signaling, speed detection, connectors, PHY</span></div>
+          <div><b>Protocol</b><span>Packets, transactions, transfers, frames, retries</span></div>
+          <div><b>Logical model</b><span>Devices, configurations, interfaces, endpoints, descriptors</span></div>
+          <div><b>Software</b><span>Host drivers, device stacks, classes, callbacks, buffers</span></div>
+          <div><b>Bring up</b><span>Attach, reset, address, enumerate, configure</span></div>
+          <div><b>Debugging</b><span>Read descriptors, inspect traffic, isolate layer failures</span></div>
+        </div>
+      </section>
+
+      <div id="course"></div>
+
+      <section class="lesson card" id="glossarySection" data-title="Glossary">
+        <div class="lessonHeader">
+          <div><span class="lessonNumber">REFERENCE</span><h2>Searchable USB glossary</h2></div>
+        </div>
+        <input class="glossarySearch" id="glossarySearch" type="search" placeholder="Search a USB term">
+        <div id="glossaryGrid" class="glossaryGrid"></div>
+      </section>
+
+      <section class="lesson card" id="sourcesSection" data-title="Sources">
+        <div class="lessonHeader">
+          <div><span class="lessonNumber">REFERENCE</span><h2>Primary references</h2></div>
+        </div>
+        <p>This teaching site is a guided introduction. When implementation details matter, verify them against the specification and the class specification for the device you are building.</p>
+        <div class="sourceGrid">
+          <a href="https://www.usb.org/document-library/usb-20-specification" target="_blank" rel="noreferrer"><b>USB 2.0 Specification</b><span>USB Implementers Forum</span></a>
+          <a href="https://www.usb.org/usb-32-0" target="_blank" rel="noreferrer"><b>USB 3.2</b><span>USB Implementers Forum</span></a>
+          <a href="https://www.usb.org/usb4" target="_blank" rel="noreferrer"><b>USB4</b><span>USB Implementers Forum</span></a>
+          <a href="https://www.usb.org/defined-class-codes" target="_blank" rel="noreferrer"><b>Defined class codes</b><span>USB Implementers Forum</span></a>
+          <a href="https://www.usb.org/usb-charger-pd" target="_blank" rel="noreferrer"><b>USB Power Delivery overview</b><span>USB Implementers Forum</span></a>
+          <a href="https://docs.kernel.org/usb/" target="_blank" rel="noreferrer"><b>Linux USB documentation</b><span>Linux kernel documentation</span></a>
+        </div>
+      </section>
+
+      <footer>
+        <p>USB From Zero is a self contained learning site. Your progress and theme are stored only in your browser.</p>
+      </footer>
+    </main>
+  </div>
+  <script>
+const lessons = [
+  {
+    group: "Foundation",
+    id: "lesson1",
+    title: "1. What USB actually is",
+    body: `
+      <p>USB means <strong>Universal Serial Bus</strong>. It is not only a connector. It is a complete system defining electrical behavior, signaling, bus access, packet formats, device discovery, logical organization, software expectations, and many standardized device classes.</p>
+      <div class="ideaBox"><div class="calloutTitle">FIRST MENTAL MODEL</div><strong>USB is host controlled.</strong> In classic USB communication, a peripheral does not simply transmit whenever it wants. The host controller schedules bus activity and asks devices to send or receive data.</div>
+      <div class="threeCol">
+        <div class="miniCard"><h3>Host</h3><p>The computer or embedded system controlling the bus.</p></div>
+        <div class="miniCard"><h3>Hub</h3><p>Expands one host port into more attachment points while remaining under host control.</p></div>
+        <div class="miniCard"><h3>Device</h3><p>A keyboard, mouse, MCU board, storage device, camera, audio interface, and many other peripherals.</p></div>
+      </div>
+      <figure class="diagram">
+        <svg viewBox="0 0 900 310" role="img" aria-label="USB tiered star topology">
+          <defs><marker id="a1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" class="svgArrow"></path></marker></defs>
+          <rect x="350" y="18" width="200" height="55" rx="14" class="svgBox accent"></rect><text x="450" y="51" text-anchor="middle" class="svgText strong">USB host</text>
+          <rect x="350" y="118" width="200" height="55" rx="14" class="svgBox"></rect><text x="450" y="151" text-anchor="middle" class="svgText strong">Hub</text>
+          <rect x="55" y="234" width="180" height="55" rx="14" class="svgBox"></rect><text x="145" y="267" text-anchor="middle" class="svgText">Keyboard</text>
+          <rect x="360" y="234" width="180" height="55" rx="14" class="svgBox"></rect><text x="450" y="267" text-anchor="middle" class="svgText">MCU device</text>
+          <rect x="665" y="234" width="180" height="55" rx="14" class="svgBox"></rect><text x="755" y="267" text-anchor="middle" class="svgText">Storage</text>
+          <line x1="450" y1="73" x2="450" y2="113" class="svgLine" marker-end="url(#a1)"></line>
+          <line x1="390" y1="173" x2="160" y2="230" class="svgLine" marker-end="url(#a1)"></line>
+          <line x1="450" y1="173" x2="450" y2="230" class="svgLine" marker-end="url(#a1)"></line>
+          <line x1="510" y1="173" x2="740" y2="230" class="svgLine" marker-end="url(#a1)"></line>
+        </svg>
+        <figcaption>USB uses a tiered star topology. Logically the host is in charge even when hubs sit between host and peripheral.</figcaption>
+      </figure>
+      <div class="rememberBox"><div class="calloutTitle">REMEMBER</div>USB Type C describes a connector system. USB 2, USB 3.2, and USB4 describe data architecture or performance generations. USB Power Delivery describes negotiated power. They are related but not interchangeable names.</div>`
+  },
+  {
+    group: "Foundation",
+    id: "lesson2",
+    title: "2. The physical layer",
+    body: `
+      <p>At the lowest level, USB is voltage, current, timing, line states, receivers, transmitters, cables, and connectors. A USB controller normally contains or connects to a <span class="term">PHY</span>, meaning the physical layer circuitry that converts digital controller data into electrical signaling and back.</p>
+      <h3>USB 2 bus wires</h3>
+      <div class="fourCol">
+        <div class="miniCard"><h4>VBUS</h4><p>Bus power supplied from the host side under the applicable USB power rules.</p></div>
+        <div class="miniCard"><h4>D plus</h4><p>One conductor of the USB 2 differential data pair.</p></div>
+        <div class="miniCard"><h4>D minus</h4><p>The other conductor of the USB 2 differential data pair.</p></div>
+        <div class="miniCard"><h4>GND</h4><p>Electrical ground reference.</p></div>
+      </div>
+      <figure class="diagram">
+        <svg viewBox="0 0 900 280" role="img" aria-label="Simplified USB 2 cable wiring">
+          <rect x="45" y="55" width="190" height="170" rx="18" class="svgBox accent"></rect><text x="140" y="90" text-anchor="middle" class="svgText strong">Host port</text>
+          <rect x="665" y="55" width="190" height="170" rx="18" class="svgBox accent"></rect><text x="760" y="90" text-anchor="middle" class="svgText strong">Device port</text>
+          <line x1="235" y1="115" x2="665" y2="115" class="svgLine"></line><text x="450" y="105" text-anchor="middle" class="svgText small">VBUS</text>
+          <line x1="235" y1="145" x2="665" y2="145" class="svgLine"></line><text x="450" y="137" text-anchor="middle" class="svgText small">D plus</text>
+          <line x1="235" y1="175" x2="665" y2="175" class="svgLine"></line><text x="450" y="167" text-anchor="middle" class="svgText small">D minus</text>
+          <line x1="235" y1="205" x2="665" y2="205" class="svgLine"></line><text x="450" y="197" text-anchor="middle" class="svgText small">GND</text>
+        </svg>
+        <figcaption>This is the conceptual USB 2 wiring view. Real connectors can include shielding, identification contacts, SuperSpeed pairs, configuration channel contacts, sideband signals, and duplicated contacts depending on connector type.</figcaption>
+      </figure>
+      <h3>Nominal USB data rates you should recognize</h3>
+      <div class="tableWrap"><table><thead><tr><th>Name</th><th>Nominal signaling rate</th><th>Architecture</th><th>Beginner note</th></tr></thead><tbody>
+        <tr><td>Low Speed</td><td>1.5 Mbit/s</td><td>USB 1.x and USB 2 ecosystem</td><td>Historically used for simple human interface peripherals.</td></tr>
+        <tr><td>Full Speed</td><td>12 Mbit/s</td><td>USB 1.x and USB 2 ecosystem</td><td>Very common in microcontrollers.</td></tr>
+        <tr><td>High Speed</td><td>480 Mbit/s</td><td>USB 2.0</td><td>Requires a High Speed capable PHY.</td></tr>
+        <tr><td>SuperSpeed</td><td>5 Gbit/s</td><td>USB 3.x</td><td>Uses additional high speed signal paths.</td></tr>
+        <tr><td>SuperSpeed 10 Gbit/s</td><td>10 Gbit/s</td><td>USB 3.x</td><td>Faster USB 3 generation.</td></tr>
+        <tr><td>USB 3.2 20 Gbit/s</td><td>20 Gbit/s aggregate</td><td>USB 3.2</td><td>Uses two lanes of 10 Gbit/s on supported Type C links.</td></tr>
+      </tbody></table></div>
+      <div class="warningBox"><div class="calloutTitle">DO NOT EQUATE SPEED WITH PAYLOAD</div>Signaling rate is not the same as application throughput. Encoding, protocol overhead, scheduling, host behavior, device firmware, storage speed, and software all reduce real payload throughput.</div>`
+  },
+  {
+    group: "Foundation",
+    id: "lesson3",
+    title: "3. The USB software stack",
+    body: `
+      <p>The word <strong>stack</strong> means a layered software architecture. Each layer has a narrower job. On the host, an application usually talks to an operating system interface rather than producing raw USB packets itself. On an embedded peripheral, your application often calls a device library that manages descriptors, endpoint state, interrupts, packet buffers, and controller registers.</p>
+      <figure class="diagram">
+        <div class="stackDiagram">
+          <div class="stackCol">
+            <div class="stackLayer accent">Host application</div>
+            <div class="stackLayer">Class or function driver</div>
+            <div class="stackLayer">OS USB core</div>
+            <div class="stackLayer">Host controller driver</div>
+            <div class="stackLayer">Host controller plus PHY</div>
+          </div>
+          <div class="busLine" aria-hidden="true"></div>
+          <div class="stackCol">
+            <div class="stackLayer accent">Device application</div>
+            <div class="stackLayer">USB class implementation</div>
+            <div class="stackLayer">USB device core</div>
+            <div class="stackLayer">Controller driver</div>
+            <div class="stackLayer">Device controller plus PHY</div>
+          </div>
+        </div>
+        <figcaption>Different libraries use different names, but the responsibilities are similar. The stack hides lower level details while exposing useful abstractions to the application.</figcaption>
+      </figure>
+      <div class="twoCol">
+        <div class="miniCard"><h3>Host side question</h3><p>Which device is attached, what interfaces does it expose, which driver should bind, and when should transfers be scheduled?</p></div>
+        <div class="miniCard"><h3>Device side question</h3><p>What descriptors should I return, which requests should I handle, which endpoints are ready, and what should my application do with received data?</p></div>
+      </div>`
+  },
+  {
+    group: "Core protocol",
+    id: "lesson4",
+    title: "4. Device, configuration, interface, endpoint",
+    body: `
+      <p>This hierarchy is the most important logical structure in USB. A physical device exposes one device descriptor, one or more configurations, interfaces inside a configuration, and endpoints used by those interfaces.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 920 430" role="img" aria-label="USB descriptor hierarchy">
+          <rect x="330" y="20" width="260" height="55" rx="14" class="svgBox accent"></rect><text x="460" y="54" text-anchor="middle" class="svgText strong">Device</text>
+          <rect x="330" y="110" width="260" height="55" rx="14" class="svgBox"></rect><text x="460" y="144" text-anchor="middle" class="svgText strong">Configuration</text>
+          <rect x="110" y="205" width="260" height="55" rx="14" class="svgBox"></rect><text x="240" y="239" text-anchor="middle" class="svgText strong">Interface 0</text>
+          <rect x="550" y="205" width="260" height="55" rx="14" class="svgBox"></rect><text x="680" y="239" text-anchor="middle" class="svgText strong">Interface 1</text>
+          <rect x="38" y="335" width="175" height="55" rx="14" class="svgBox"></rect><text x="125" y="369" text-anchor="middle" class="svgText">EP 1 IN</text>
+          <rect x="254" y="335" width="175" height="55" rx="14" class="svgBox"></rect><text x="341" y="369" text-anchor="middle" class="svgText">EP 1 OUT</text>
+          <rect x="492" y="335" width="175" height="55" rx="14" class="svgBox"></rect><text x="579" y="369" text-anchor="middle" class="svgText">EP 2 IN</text>
+          <rect x="708" y="335" width="175" height="55" rx="14" class="svgBox"></rect><text x="795" y="369" text-anchor="middle" class="svgText">EP 3 IN</text>
+          <path d="M460 75 V108 M460 165 L240 202 M460 165 L680 202 M240 260 L125 332 M240 260 L341 332 M680 260 L579 332 M680 260 L795 332" class="svgLine"></path>
+        </svg>
+        <figcaption>A composite device can expose multiple interfaces. Each interface can represent a different function and can have multiple alternate settings.</figcaption>
+      </figure>
+      <div class="fourCol">
+        <div class="miniCard"><h4>Device</h4><p>The whole USB peripheral and its global identity.</p></div>
+        <div class="miniCard"><h4>Configuration</h4><p>A complete operating arrangement including interfaces and power information.</p></div>
+        <div class="miniCard"><h4>Interface</h4><p>A logical function or portion of a function. Drivers often bind here.</p></div>
+        <div class="miniCard"><h4>Endpoint</h4><p>A directional communication channel identified by endpoint number and direction.</p></div>
+      </div>
+      <div class="rememberBox"><div class="calloutTitle">SPECIAL ENDPOINT</div>Every USB device has <strong>endpoint zero</strong>. It is a bidirectional control endpoint used during enumeration and for standard control requests.</div>`
+  },
+  {
+    group: "Core protocol",
+    id: "lesson5",
+    title: "5. Endpoint direction and addressing",
+    body: `
+      <p>Endpoint direction is named from the <strong>host point of view</strong>. An <span class="term">IN</span> endpoint sends data from device to host. An <span class="term">OUT</span> endpoint receives data from host to device.</p>
+      <figure class="diagram">
+        <div class="endpointGrid">
+          <div class="endpointSide"><div class="endpointPill">OUT token</div><div class="endpointPill">Host data</div></div>
+          <div class="endpointCenter">USB DEVICE</div>
+          <div class="endpointSide"><div class="endpointPill">IN token</div><div class="endpointPill">Device data</div></div>
+        </div>
+        <figcaption>Think from the host. OUT means out of the host. IN means into the host.</figcaption>
+      </figure>
+      <p>An endpoint address is commonly represented with the endpoint number in the low bits and direction in the high bit. For example, endpoint address <code>0x81</code> means endpoint 1 IN, while <code>0x01</code> means endpoint 1 OUT.</p>
+      <div class="codeBlock">0x81 = 1000 0001b
+       ^       ^
+       |       endpoint number 1
+       direction bit set means IN</div>`
+  },
+  {
+    group: "Core protocol",
+    id: "lesson6",
+    title: "6. The four transfer types",
+    body: `
+      <p>USB gives endpoints one of four transfer behaviors. Choosing the correct type means understanding the tradeoff between guaranteed delivery, bounded latency, bandwidth reservation, and protocol overhead.</p>
+      <div class="tableWrap"><table><thead><tr><th>Transfer type</th><th>Typical use</th><th>Reliability behavior</th><th>Timing behavior</th></tr></thead><tbody>
+        <tr><td><strong>Control</strong></td><td>Enumeration, commands, configuration</td><td>Error detection and retry behavior</td><td>Designed for control traffic, not continuous bulk payload</td></tr>
+        <tr><td><strong>Bulk</strong></td><td>Storage, printers, large exact data</td><td>Reliable with retry</td><td>Uses available bus time, no strict latency guarantee</td></tr>
+        <tr><td><strong>Interrupt</strong></td><td>Keyboard, mouse, small periodic reports</td><td>Reliable</td><td>Host provides bounded polling opportunity according to endpoint scheduling rules</td></tr>
+        <tr><td><strong>Isochronous</strong></td><td>Streaming audio and time sensitive media</td><td>No retry for corrupted data</td><td>Bus time is scheduled for predictable delivery</td></tr>
+      </tbody></table></div>
+      <div class="labBox">
+        <div class="calloutTitle">TRANSFER CHOOSER</div>
+        <div class="flowRow"><span class="flowBox">Must arrive exactly?</span><span class="flowArrow">→</span><span class="flowBox">Yes</span><span class="flowArrow">→</span><span class="flowBox">Bulk or Interrupt</span></div>
+        <div class="flowRow"><span class="flowBox">Continuous timing matters more than retry?</span><span class="flowArrow">→</span><span class="flowBox">Yes</span><span class="flowArrow">→</span><span class="flowBox">Isochronous</span></div>
+        <div class="flowRow"><span class="flowBox">Configuring device state?</span><span class="flowArrow">→</span><span class="flowBox">Yes</span><span class="flowArrow">→</span><span class="flowBox">Control</span></div>
+      </div>`
+  },
+  {
+    group: "Core protocol",
+    id: "lesson7",
+    title: "7. Packet, transaction, transfer",
+    body: `
+      <p>These words describe different scales. A <strong>packet</strong> is a formatted piece placed on the bus. A <strong>transaction</strong> is a small protocol exchange built from packets. A <strong>transfer</strong> is the higher level movement requested by software and may require one or many transactions.</p>
+      <div class="flowRow"><span class="flowBox">Transfer</span><span class="flowArrow">contains</span><span class="flowBox">Transactions</span><span class="flowArrow">contain</span><span class="flowBox">Packets</span><span class="flowArrow">contain</span><span class="flowBox">Fields and bits</span></div>
+      <figure class="diagram">
+        <div class="packetBar">
+          <div><b>SYNC</b><small>receiver timing</small></div>
+          <div><b>PID</b><small>packet type</small></div>
+          <div><b>Address</b><small>when applicable</small></div>
+          <div><b>Payload or token fields</b><small>depends on packet type</small></div>
+          <div><b>CRC</b><small>error check</small></div>
+          <div><b>EOP</b><small>end</small></div>
+        </div>
+        <figcaption>Conceptual USB 2 packet anatomy. Exact fields differ by packet type.</figcaption>
+      </figure>
+      <h3>Common packet families</h3>
+      <div class="threeCol">
+        <div class="miniCard"><h4>Token packets</h4><p>Tell a device what transaction the host is starting. Examples include IN, OUT, SETUP, and SOF.</p></div>
+        <div class="miniCard"><h4>Data packets</h4><p>Carry payload bytes. DATA0 and DATA1 are central to normal USB 2 data sequencing.</p></div>
+        <div class="miniCard"><h4>Handshake packets</h4><p>Report transaction status. Important examples include ACK, NAK, and STALL.</p></div>
+      </div>`
+  },
+  {
+    group: "Core protocol",
+    id: "lesson8",
+    title: "8. IN and OUT transactions",
+    body: `
+      <p>For USB 2, the host starts normal bus transactions. The token identifies the target device address, endpoint, and direction implied by token type.</p>
+      <h3>Typical OUT transaction</h3>
+      <div class="flowRow"><span class="flowBox">Host: OUT token</span><span class="flowArrow">→</span><span class="flowBox">Host: DATA packet</span><span class="flowArrow">→</span><span class="flowBox">Device: ACK or NAK or STALL</span></div>
+      <h3>Typical IN transaction</h3>
+      <div class="flowRow"><span class="flowBox">Host: IN token</span><span class="flowArrow">→</span><span class="flowBox">Device: DATA or NAK or STALL</span><span class="flowArrow">→</span><span class="flowBox">Host: ACK if data accepted</span></div>
+      <div class="twoCol">
+        <div class="miniCard"><h4>NAK</h4><p>Usually means the endpoint is temporarily not ready. It is normal flow control, not automatically a fatal error.</p></div>
+        <div class="miniCard"><h4>STALL</h4><p>Means the endpoint cannot complete the request as currently asked. Software may need recovery or a clear feature request depending on context.</p></div>
+      </div>`
+  },
+  {
+    group: "Core protocol",
+    id: "lesson9",
+    title: "9. DATA0, DATA1, CRC, and retry",
+    body: `
+      <p>Reliable USB 2 transfers use error detection plus protocol state. A CRC detects corrupted packet content. Data packet identifiers such as DATA0 and DATA1 help the receiver distinguish a new packet from a retransmission when an acknowledgement was lost.</p>
+      <figure class="diagram">
+        <div class="timeline">
+          <div class="timelineStep"><div class="timelineIndex">1</div><div class="timelineBody"><b>Sender transmits DATA0</b><span>Receiver gets the payload correctly.</span></div></div>
+          <div class="timelineStep"><div class="timelineIndex">2</div><div class="timelineBody"><b>ACK is lost</b><span>The sender does not know that the receiver already accepted the payload.</span></div></div>
+          <div class="timelineStep"><div class="timelineIndex">3</div><div class="timelineBody"><b>DATA0 is sent again</b><span>The receiver sees the old data toggle and recognizes it as a duplicate rather than delivering it twice.</span></div></div>
+          <div class="timelineStep"><div class="timelineIndex">4</div><div class="timelineBody"><b>Protocol state remains consistent</b><span>The transaction can recover without duplicating application data.</span></div></div>
+        </div>
+      </figure>
+      <div class="rememberBox"><div class="calloutTitle">CORE IDEA</div>Error detection tells you that something went wrong. Sequence state helps you recover without accidentally treating the same payload as new data twice.</div>`
+  },
+  {
+    group: "Enumeration",
+    id: "lesson10",
+    title: "10. What happens when you plug in a device",
+    body: `
+      <p><strong>Enumeration</strong> is the process by which the host discovers a new device, learns its capabilities from descriptors, assigns it an address, selects a configuration, and loads the appropriate software support.</p>
+      <div class="timeline">
+        <div class="timelineStep"><div class="timelineIndex">1</div><div class="timelineBody"><b>Physical attach is detected</b><span>The host side recognizes that a device is present.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">2</div><div class="timelineBody"><b>Port reset and speed establishment</b><span>The link is brought into a known state.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">3</div><div class="timelineBody"><b>Endpoint zero is used at the default address</b><span>The host begins standard control requests.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">4</div><div class="timelineBody"><b>Host reads device information</b><span>Descriptors reveal packet size, vendor and product identity, configurations, interfaces, and endpoints.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">5</div><div class="timelineBody"><b>Host assigns a device address</b><span>Future transactions target the new address.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">6</div><div class="timelineBody"><b>Host reads the complete descriptor tree</b><span>The operating system determines which drivers or class handlers are required.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">7</div><div class="timelineBody"><b>Host selects a configuration</b><span>The device enters its configured state and functional endpoints become available.</span></div></div>
+      </div>
+      <div class="labBox">
+        <div class="calloutTitle">ENUMERATION STEPPER</div>
+        <div id="enumStage" class="enumStage"></div>
+        <div class="stepControls"><button id="enumPrev" class="stepButton secondary" type="button">Previous</button><button id="enumNext" class="stepButton" type="button">Next</button><button id="enumReset" class="stepButton secondary" type="button">Reset</button></div>
+      </div>`
+  },
+  {
+    group: "Enumeration",
+    id: "lesson11",
+    title: "11. Descriptors are the device's self description",
+    body: `
+      <p>A descriptor is a structured byte sequence returned by the device. Descriptors tell the host how the device is organized and what software model it expects. The host should not need to guess the endpoint map.</p>
+      <div class="twoCol">
+        <div class="miniCard"><h3>Device descriptor</h3><p>Global identity and capabilities including USB version field, class related fields, endpoint zero maximum packet size, vendor ID, product ID, device release, string indices, and number of configurations.</p></div>
+        <div class="miniCard"><h3>Configuration descriptor tree</h3><p>Starts with a configuration descriptor and includes subordinate interface, class specific, and endpoint descriptors.</p></div>
+        <div class="miniCard"><h3>String descriptor</h3><p>Optional human readable Unicode strings such as manufacturer, product, and serial number.</p></div>
+        <div class="miniCard"><h3>Class specific descriptors</h3><p>Extra structures defined by a USB device class, such as HID or audio.</p></div>
+      </div>
+      <h3>Example device descriptor layout</h3>
+      <div class="tableWrap"><table><thead><tr><th>Field</th><th>Size</th><th>Meaning</th></tr></thead><tbody>
+        <tr><td>bLength</td><td>1 byte</td><td>Length of this descriptor.</td></tr>
+        <tr><td>bDescriptorType</td><td>1 byte</td><td>Identifies this as a device descriptor.</td></tr>
+        <tr><td>bcdUSB</td><td>2 bytes</td><td>USB specification release encoded in binary coded decimal style.</td></tr>
+        <tr><td>bDeviceClass, bDeviceSubClass, bDeviceProtocol</td><td>3 bytes</td><td>Class identification strategy for the device.</td></tr>
+        <tr><td>bMaxPacketSize0</td><td>1 byte</td><td>Maximum packet size for endpoint zero in the applicable speed and specification context.</td></tr>
+        <tr><td>idVendor, idProduct</td><td>4 bytes total</td><td>Vendor and product identifiers.</td></tr>
+        <tr><td>bcdDevice</td><td>2 bytes</td><td>Device release number chosen by the implementer.</td></tr>
+        <tr><td>iManufacturer, iProduct, iSerialNumber</td><td>3 bytes</td><td>Indices of optional string descriptors.</td></tr>
+        <tr><td>bNumConfigurations</td><td>1 byte</td><td>Number of available configurations.</td></tr>
+      </tbody></table></div>
+      <div class="warningBox"><div class="calloutTitle">PRACTICAL WARNING</div>A device can electrically connect perfectly and still fail enumeration because one descriptor length, total length, endpoint definition, request response, or state transition is wrong.</div>`
+  },
+  {
+    group: "Enumeration",
+    id: "lesson12",
+    title: "12. The 8 byte SETUP packet",
+    body: `
+      <p>Every USB 2 control transfer begins with a SETUP transaction carrying exactly eight bytes of request information. These fields tell the device the direction, request category, recipient, request code, two request specific values, and the expected data length.</p>
+      <div class="byteRow"><div class="byte">bmRequestType<span>1 byte</span></div><div class="byte">bRequest<span>1 byte</span></div><div class="byte">wValue<span>2 bytes</span></div><div class="byte">wIndex<span>2 bytes</span></div><div class="byte">wLength<span>2 bytes</span></div></div>
+      <div class="threeCol">
+        <div class="miniCard"><h4>bmRequestType</h4><p>Encodes direction, request type, and recipient in one byte.</p></div>
+        <div class="miniCard"><h4>bRequest</h4><p>The actual request code such as GET DESCRIPTOR or SET ADDRESS for standard requests.</p></div>
+        <div class="miniCard"><h4>wValue and wIndex</h4><p>Meaning depends on the request. They often identify descriptor type, descriptor index, interface, endpoint, feature, or other context.</p></div>
+      </div>
+      <div class="labBox">
+        <div class="calloutTitle">bmRequestType BUILDER</div>
+        <div class="requestBuilder">
+          <label>Direction<select id="reqDirection"><option value="0">Host to device</option><option value="128">Device to host</option></select></label>
+          <label>Type<select id="reqType"><option value="0">Standard</option><option value="32">Class</option><option value="64">Vendor</option></select></label>
+          <label>Recipient<select id="reqRecipient"><option value="0">Device</option><option value="1">Interface</option><option value="2">Endpoint</option><option value="3">Other</option></select></label>
+        </div>
+        <div class="resultBox" id="requestResult">bmRequestType = 0x00 = 00000000b</div>
+      </div>`
+  },
+  {
+    group: "Enumeration",
+    id: "lesson13",
+    title: "13. Control transfer stages",
+    body: `
+      <p>A control transfer is structured. The first stage always communicates the request. An optional data stage moves request data. The final status stage confirms completion and uses the opposite direction from the data direction.</p>
+      <figure class="diagram">
+        <div class="flowRow"><span class="flowBox">SETUP stage</span><span class="flowArrow">→</span><span class="flowBox">optional DATA stage</span><span class="flowArrow">→</span><span class="flowBox">STATUS stage</span></div>
+        <figcaption>Control transfers are not the same thing as a single packet. Each stage itself is implemented through bus transactions.</figcaption>
+      </figure>
+      <h3>Example: host reads a descriptor</h3>
+      <div class="timeline">
+        <div class="timelineStep"><div class="timelineIndex">1</div><div class="timelineBody"><b>SETUP</b><span>Host sends GET DESCRIPTOR request details.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">2</div><div class="timelineBody"><b>DATA IN</b><span>Device returns descriptor bytes, potentially over multiple packets.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">3</div><div class="timelineBody"><b>STATUS OUT</b><span>Host completes the control transfer with the opposite direction status stage.</span></div></div>
+      </div>`
+  },
+  {
+    group: "Scheduling",
+    id: "lesson14",
+    title: "14. Frames, microframes, and host scheduling",
+    body: `
+      <p>USB is scheduled by the host. In USB 2, time is organized around frames. High Speed operation subdivides the frame into microframes, allowing finer scheduling. The host controller maintains schedules for periodic and nonperiodic traffic according to protocol rules and available bus time.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 920 250" role="img" aria-label="USB frame and microframe timing concept">
+          <rect x="35" y="70" width="850" height="74" rx="12" class="svgBox"></rect>
+          <text x="460" y="50" text-anchor="middle" class="svgText strong">One 1 ms USB frame concept</text>
+          <g>
+            <rect x="45" y="82" width="101" height="50" rx="7" class="svgBox accent"></rect><text x="95" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+            <rect x="150" y="82" width="101" height="50" rx="7" class="svgBox accent"></rect><text x="200" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+            <rect x="255" y="82" width="101" height="50" rx="7" class="svgBox accent"></rect><text x="305" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+            <rect x="360" y="82" width="101" height="50" rx="7" class="svgBox accent"></rect><text x="410" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+            <rect x="465" y="82" width="101" height="50" rx="7" class="svgBox accent"></rect><text x="515" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+            <rect x="570" y="82" width="101" height="50" rx="7" class="svgBox accent"></rect><text x="620" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+            <rect x="675" y="82" width="101" height="50" rx="7" class="svgBox accent"></rect><text x="725" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+            <rect x="780" y="82" width="95" height="50" rx="7" class="svgBox accent"></rect><text x="827" y="112" text-anchor="middle" class="svgText small">125 µs</text>
+          </g>
+          <text x="460" y="190" text-anchor="middle" class="svgText">High Speed scheduling uses eight 125 µs microframes per 1 ms frame.</text>
+        </svg>
+      </figure>
+      <div class="ideaBox"><div class="calloutTitle">WHY THIS MATTERS</div>An interrupt endpoint does not interrupt the CPU across the cable. The host polls it according to its scheduling interval. The word interrupt describes the transfer service model, not an asynchronous device takeover of the bus.</div>`
+  },
+  {
+    group: "Device classes",
+    id: "lesson15",
+    title: "15. USB classes and driver matching",
+    body: `
+      <p>A USB class standardizes how a family of devices describes itself and exchanges data. If a device follows a class specification supported by the operating system, it can often use an existing driver instead of requiring a custom driver.</p>
+      <div class="tableWrap"><table><thead><tr><th>Class or family</th><th>Examples</th><th>What is standardized</th></tr></thead><tbody>
+        <tr><td>HID</td><td>Keyboard, mouse, game controller, custom report based controls</td><td>Descriptors, reports, control behavior, interrupt data model</td></tr>
+        <tr><td>CDC</td><td>Virtual serial, networking related communication functions</td><td>Communication device interfaces and subclass protocols</td></tr>
+        <tr><td>Mass Storage</td><td>Flash drives, card readers</td><td>Storage transport behavior combined with storage command models</td></tr>
+        <tr><td>Audio</td><td>Microphones, speakers, interfaces</td><td>Audio streaming, controls, clocks, formats, topology</td></tr>
+        <tr><td>Video</td><td>Webcams and video devices</td><td>Video control and streaming behavior</td></tr>
+        <tr><td>DFU</td><td>Firmware update mode</td><td>Standardized device firmware upgrade behavior</td></tr>
+        <tr><td>Vendor specific</td><td>Custom proprietary device function</td><td>Nothing beyond base USB rules. You define the application protocol.</td></tr>
+      </tbody></table></div>
+      <div class="rememberBox"><div class="calloutTitle">CLASS CODE PLACEMENT</div>USB class identification can appear in the device descriptor or in interface descriptors depending on the class model. Composite devices commonly identify functions at the interface level.</div>`
+  },
+  {
+    group: "Device classes",
+    id: "lesson16",
+    title: "16. HID example from cable to application",
+    body: `
+      <p>HID is a useful teaching class because the entire path is easy to visualize. A keyboard can expose an HID interface with an interrupt IN endpoint. The host periodically gives that endpoint opportunities to provide a report.</p>
+      <div class="flowRow"><span class="flowBox">Key switch</span><span class="flowArrow">→</span><span class="flowBox">MCU firmware</span><span class="flowArrow">→</span><span class="flowBox">HID report</span><span class="flowArrow">→</span><span class="flowBox">Interrupt IN endpoint</span><span class="flowArrow">→</span><span class="flowBox">OS HID driver</span><span class="flowArrow">→</span><span class="flowBox">Application</span></div>
+      <h3>A report is application data with a defined binary layout</h3>
+      <div class="codeBlock">Example conceptual keyboard report
+Byte 0  modifier bits
+Byte 1  reserved
+Byte 2  key code slot
+Byte 3  key code slot
+...
+
+The HID report descriptor tells the host how to interpret the report fields.</div>
+      <div class="warningBox"><div class="calloutTitle">IMPORTANT DISTINCTION</div>The USB endpoint descriptor describes the transport endpoint. The HID report descriptor describes the meaning and format of HID report data. They solve different problems.</div>`
+  },
+  {
+    group: "Device classes",
+    id: "lesson17",
+    title: "17. CDC virtual serial example",
+    body: `
+      <p>A common microcontroller design uses the USB Communications Device Class family to present a serial style interface to the host. The implementation may expose more than one interface because control and data responsibilities are separated by the applicable class model.</p>
+      <figure class="diagram">
+        <div class="flowRow"><span class="flowBox">Terminal program</span><span class="flowArrow">→</span><span class="flowBox">OS CDC driver</span><span class="flowArrow">→</span><span class="flowBox">Bulk OUT</span><span class="flowArrow">→</span><span class="flowBox">MCU RX buffer</span></div>
+        <div class="flowRow"><span class="flowBox">MCU TX buffer</span><span class="flowArrow">→</span><span class="flowBox">Bulk IN</span><span class="flowArrow">→</span><span class="flowBox">OS CDC driver</span><span class="flowArrow">→</span><span class="flowBox">Terminal program</span></div>
+      </figure>
+      <p>The key lesson is that an application friendly abstraction such as a serial port can be implemented on top of USB descriptors, class requests, endpoints, transactions, scheduling, and host drivers.</p>`
+  },
+  {
+    group: "Firmware implementation",
+    id: "lesson18",
+    title: "18. What device firmware actually does",
+    body: `
+      <p>In a microcontroller, the USB peripheral handles much of the signaling and packet machinery. Your firmware configures the controller and reacts to events. A device stack normally separates low level controller work from standard requests, class behavior, and your application.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 920 330" role="img" aria-label="USB device firmware flow">
+          <rect x="50" y="35" width="180" height="54" rx="13" class="svgBox accent"></rect><text x="140" y="68" text-anchor="middle" class="svgText strong">USB interrupt or event</text>
+          <rect x="370" y="35" width="180" height="54" rx="13" class="svgBox"></rect><text x="460" y="68" text-anchor="middle" class="svgText strong">Controller driver</text>
+          <rect x="690" y="35" width="180" height="54" rx="13" class="svgBox"></rect><text x="780" y="68" text-anchor="middle" class="svgText strong">Device core</text>
+          <rect x="690" y="225" width="180" height="54" rx="13" class="svgBox accent"></rect><text x="780" y="258" text-anchor="middle" class="svgText strong">Application callback</text>
+          <rect x="370" y="225" width="180" height="54" rx="13" class="svgBox"></rect><text x="460" y="258" text-anchor="middle" class="svgText strong">Endpoint buffer</text>
+          <rect x="50" y="225" width="180" height="54" rx="13" class="svgBox"></rect><text x="140" y="258" text-anchor="middle" class="svgText strong">USB packet memory</text>
+          <path d="M230 62 H365 M550 62 H685 M780 89 V220 M690 252 H555 M370 252 H235" class="svgLine"></path>
+        </svg>
+      </figure>
+      <h3>Typical responsibilities</h3>
+      <div class="threeCol">
+        <div class="miniCard"><h4>Device core</h4><p>Enumeration state, standard requests, descriptors, endpoint zero state machine.</p></div>
+        <div class="miniCard"><h4>Class layer</h4><p>HID reports, CDC requests, storage commands, audio controls, or another class protocol.</p></div>
+        <div class="miniCard"><h4>Application</h4><p>The actual product behavior, such as reading sensors, sending telemetry, or acting on commands.</p></div>
+      </div>`
+  },
+  {
+    group: "Firmware implementation",
+    id: "lesson19",
+    title: "19. Device state machine",
+    body: `
+      <p>The USB specification defines device states. For a beginner implementation, it is helpful to reason about progression from powered attachment through default communication, addressed operation, and configured operation.</p>
+      <div class="flowRow"><span class="flowBox">Attached and powered</span><span class="flowArrow">→</span><span class="flowBox">Default</span><span class="flowArrow">→</span><span class="flowBox">Addressed</span><span class="flowArrow">→</span><span class="flowBox">Configured</span></div>
+      <div class="twoCol">
+        <div class="miniCard"><h3>Default state</h3><p>Communication uses the default USB address and endpoint zero after reset.</p></div>
+        <div class="miniCard"><h3>Addressed state</h3><p>The host has assigned a nonzero address, but a configuration has not yet been selected.</p></div>
+        <div class="miniCard"><h3>Configured state</h3><p>The host selected a configuration and the function endpoints described by that configuration can operate.</p></div>
+        <div class="miniCard"><h3>Reset effect</h3><p>A bus reset returns USB protocol state to the required reset condition. Firmware must correctly reset endpoint and control transfer state.</p></div>
+      </div>`
+  },
+  {
+    group: "Firmware implementation",
+    id: "lesson20",
+    title: "20. Buffers, packets, and callbacks",
+    body: `
+      <p>Your application often thinks in messages. The USB controller thinks in endpoint packets and transfer descriptors. The stack is responsible for bridging these models without losing ordering, boundaries, or status.</p>
+      <div class="flowRow"><span class="flowBox">Application message</span><span class="flowArrow">→</span><span class="flowBox">Class layer</span><span class="flowArrow">→</span><span class="flowBox">Endpoint queue</span><span class="flowArrow">→</span><span class="flowBox">Packet sized chunks</span><span class="flowArrow">→</span><span class="flowBox">Controller</span></div>
+      <div class="warningBox"><div class="calloutTitle">COMMON BUG</div>Do not assume one application message always equals one USB packet. Transfers can span packets, packet sizes depend on endpoint configuration and speed, and some protocols use short packets or other rules to indicate transfer completion.</div>
+      <h3>Conceptual receive pattern</h3>
+      <div class="codeBlock">usb_out_complete(endpoint, received_count):
+    append bytes into protocol buffer
+    parse complete application messages if available
+    rearm endpoint buffer
+
+usb_in_complete(endpoint):
+    mark previous buffer reusable
+    queue next pending application data if any</div>`
+  },
+  {
+    group: "Host side",
+    id: "lesson21",
+    title: "21. What the host stack does",
+    body: `
+      <p>A host operating system must manage topology, addresses, bandwidth, power related state, enumeration, driver binding, transfer requests, error recovery, and host controller hardware.</p>
+      <figure class="diagram">
+        <div class="stackCol">
+          <div class="stackLayer accent">User application or service</div>
+          <div class="stackLayer">Class API, generic USB API, or filesystem style interface</div>
+          <div class="stackLayer">Class driver or user mode driver framework</div>
+          <div class="stackLayer">USB core and device model</div>
+          <div class="stackLayer">Host controller driver such as xHCI software</div>
+          <div class="stackLayer">Host controller hardware and root hub</div>
+        </div>
+      </figure>
+      <p>The application may see a keyboard input event, serial port, audio device, block storage volume, or library handle. The lower layers convert that friendly model into actual endpoint transfers and controller scheduling.</p>`
+  },
+  {
+    group: "Modern USB",
+    id: "lesson22",
+    title: "22. USB 3 and why it is not just faster USB 2 signaling",
+    body: `
+      <p>USB 3.x introduced a new SuperSpeed architecture using additional high speed signal paths and a substantially different link and protocol design. A USB 3 capable connection can coexist with USB 2 connectivity in the same connector system, which is why many devices conceptually contain both USB 2 and SuperSpeed connectivity paths.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 920 350" role="img" aria-label="Conceptual USB 2 and SuperSpeed parallel connectivity">
+          <rect x="55" y="60" width="180" height="230" rx="18" class="svgBox accent"></rect><text x="145" y="95" text-anchor="middle" class="svgText strong">Host</text>
+          <rect x="685" y="60" width="180" height="230" rx="18" class="svgBox accent"></rect><text x="775" y="95" text-anchor="middle" class="svgText strong">Device</text>
+          <path d="M235 145 H685" class="svgLine"></path><text x="460" y="133" text-anchor="middle" class="svgText strong">USB 2 D plus and D minus path</text>
+          <path d="M235 225 H685" class="svgLine"></path><text x="460" y="213" text-anchor="middle" class="svgText strong">SuperSpeed transmit and receive path</text>
+          <text x="460" y="265" text-anchor="middle" class="svgText small">Conceptual view only. Actual Type C lane mapping and link behavior are more involved.</text>
+        </svg>
+      </figure>
+      <div class="rememberBox"><div class="calloutTitle">CURRENT USB 3.2 LANGUAGE</div>USB 3.2 defines 5 Gbit/s, 10 Gbit/s, and 20 Gbit/s performance levels. The 20 Gbit/s mode uses two 10 Gbit/s lanes on supported links.</div>`
+  },
+  {
+    group: "Modern USB",
+    id: "lesson23",
+    title: "23. Type C, data protocol, and Power Delivery",
+    body: `
+      <p>A Type C receptacle does not by itself tell you the supported USB data speed, display capabilities, charging power, or alternate protocol support. Type C defines the connector and associated connection behavior. The attached products and cable determine the actual capabilities.</p>
+      <div class="threeCol">
+        <div class="miniCard"><h3>USB Type C</h3><p>Connector system, orientation handling, configuration channel behavior, cable identity concepts, and support for various data and power uses.</p></div>
+        <div class="miniCard"><h3>USB data</h3><p>Could be USB 2, USB 3.2, USB4, or another supported mode depending on both ends and the cable.</p></div>
+        <div class="miniCard"><h3>USB Power Delivery</h3><p>A separate negotiation protocol for flexible power contracts over compatible Type C connections.</p></div>
+      </div>
+      <figure class="diagram">
+        <svg viewBox="0 0 920 285" role="img" aria-label="USB Type C concept">
+          <rect x="65" y="58" width="790" height="168" rx="54" class="svgBox"></rect>
+          <text x="460" y="42" text-anchor="middle" class="svgText strong">Simplified Type C receptacle concept</text>
+          <g class="svgText small">
+            <text x="155" y="102">USB 2 pair</text><text x="155" y="190">USB 2 pair</text>
+            <text x="355" y="102">High speed lanes</text><text x="355" y="190">High speed lanes</text>
+            <text x="560" y="102">CC contacts</text><text x="560" y="190">VBUS and GND</text>
+            <text x="745" y="102">Sideband</text><text x="745" y="190">High speed lanes</text>
+          </g>
+        </svg>
+      </figure>
+      <div class="ideaBox"><div class="calloutTitle">POWER NOTE</div>USB Power Delivery has evolved beyond the original basic USB power model. USB IF materials describe current USB PD operation supporting power levels up to 240 W in the appropriate Extended Power Range ecosystem.</div>`
+  },
+  {
+    group: "Modern USB",
+    id: "lesson24",
+    title: "24. USB4 in one mental model",
+    body: `
+      <p>USB4 changes the mental model again. Rather than treating the cable only as a stream of USB endpoint transactions, USB4 provides a high performance architecture that can dynamically share the link among multiple protocol types. It builds on Type C and coexists with earlier USB architectures through compatibility mechanisms.</p>
+      <div class="flowRow"><span class="flowBox">USB4 link</span><span class="flowArrow">carries</span><span class="flowBox">USB data</span><span class="flowBox">Display data</span><span class="flowBox">Other tunneled protocol traffic where supported</span></div>
+      <div class="rememberBox"><div class="calloutTitle">CURRENT HIGH LEVEL FACT</div>USB IF describes USB4 as supporting operation up to 80 Gbit/s with suitable products and certified cables. For embedded firmware learning, master USB 2 device behavior first unless your project specifically requires USB 3 or USB4.</div>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson26",
+    title: "25. USB 2 signaling, line states, and High Speed entry",
+    body: `
+      <p>Once the logical protocol is clear, the electrical signaling becomes easier to understand. USB 2 does not put ordinary UART style zero and one voltage levels directly onto one wire. The receiver observes the state of the differential pair, and the protocol defines line states and transitions.</p>
+      <div class="fourCol">
+        <div class="miniCard"><h4>J state</h4><p>One of the two normal differential line states. Its actual D plus and D minus polarity depends on device speed.</p></div>
+        <div class="miniCard"><h4>K state</h4><p>The opposite normal differential line state.</p></div>
+        <div class="miniCard"><h4>SE0</h4><p>Single ended zero. Both data lines are low. It is used in important signaling including end of packet and reset related behavior.</p></div>
+        <div class="miniCard"><h4>SE1</h4><p>Both data lines high. This is not a normal USB 2 data state.</p></div>
+      </div>
+      <h3>NRZI and bit stuffing</h3>
+      <p>USB 2 uses NRZI style encoding. Conceptually, one bit value is represented by a transition and the other by no transition. Long runs without transitions would make clock recovery difficult, so the transmitter inserts a stuffing bit after the required run length and the receiver removes it again.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 920 300" role="img" aria-label="Conceptual NRZI transitions and bit stuffing">
+          <text x="40" y="42" class="svgText strong">Conceptual data bits</text>
+          <text x="40" y="82" class="svgText">1   0   1   1   1   1   1   1   stuffed 0</text>
+          <path d="M40 145 H125 V205 H210 V205 H295 V205 H380 V205 H465 V205 H550 V205 H635 V145 H720" class="svgLine"></path>
+          <text x="40" y="250" class="svgText small">The exact waveform depends on the encoded bit sequence. This drawing only shows the transition idea, not compliance timing.</text>
+        </svg>
+      </figure>
+      <h3>How a High Speed USB 2 device gets there</h3>
+      <p>A High Speed capable USB 2 device first attaches in the USB 2 connection model and then participates in the reset and chirp handshake used to determine whether both sides support High Speed operation. If High Speed negotiation does not succeed, the connection can operate at the appropriate lower USB 2 speed supported by both sides.</p>
+      <div class="warningBox"><div class="calloutTitle">IMPLEMENTATION NOTE</div>Do not attempt to reproduce USB electrical signaling with ordinary GPIO bit banging for a standards compliant High Speed implementation. Use a USB controller and suitable PHY designed for the required speed.</div>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson27",
+    title: "26. PID families and token fields",
+    body: `
+      <p>The packet identifier tells the receiver what kind of packet follows. In USB 2, the PID field contains a four bit packet code plus its complemented form, providing immediate protection against many PID bit errors.</p>
+      <div class="tableWrap"><table><thead><tr><th>Family</th><th>Important examples</th><th>Purpose</th></tr></thead><tbody>
+        <tr><td>Token</td><td>OUT, IN, SOF, SETUP</td><td>Starts or identifies a transaction and carries addressing or frame information.</td></tr>
+        <tr><td>Data</td><td>DATA0, DATA1, DATA2, MDATA</td><td>Carries payload and sequence state. Which forms are legal depends on transfer and speed context.</td></tr>
+        <tr><td>Handshake</td><td>ACK, NAK, STALL, NYET</td><td>Communicates transaction acceptance, temporary readiness, halt state, or High Speed protocol status.</td></tr>
+        <tr><td>Special</td><td>PRE, SPLIT, PING and related encodings</td><td>Supports specialized bus and hub behavior.</td></tr>
+      </tbody></table></div>
+      <h3>Address and endpoint targeting</h3>
+      <p>Normal USB 2 token packets can identify a device address and endpoint number. The USB device address space is seven bits, allowing addresses from 1 through 127, while address zero is reserved for default state communication during enumeration.</p>
+      <figure class="diagram">
+        <div class="packetBar" style="grid-template-columns:1fr 1fr 2fr 1.2fr 1fr">
+          <div><b>SYNC</b><small>timing</small></div><div><b>PID</b><small>token type</small></div><div><b>ADDR</b><small>7 bit device address</small></div><div><b>ENDP</b><small>4 bit endpoint</small></div><div><b>CRC5</b><small>token check</small></div>
+        </div>
+        <figcaption>Conceptual IN, OUT, and SETUP token field organization. Bit transmission order and exact encoding details belong to the USB 2 specification.</figcaption>
+      </figure>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson28",
+    title: "27. Standard requests you must recognize",
+    body: `
+      <p>Standard control requests are the vocabulary the host uses to discover and manage a USB device. A device stack normally implements these in the endpoint zero control state machine.</p>
+      <div class="tableWrap"><table><thead><tr><th>Request</th><th>Why it exists</th><th>Typical beginner association</th></tr></thead><tbody>
+        <tr><td>GET STATUS</td><td>Reads status bits for a device, interface, or endpoint depending on recipient.</td><td>Device and endpoint state inspection.</td></tr>
+        <tr><td>CLEAR FEATURE</td><td>Clears a specified feature.</td><td>Commonly associated with clearing endpoint halt when appropriate.</td></tr>
+        <tr><td>SET FEATURE</td><td>Enables a specified feature.</td><td>Feature behavior depends on recipient and specification context.</td></tr>
+        <tr><td>SET ADDRESS</td><td>Assigns the USB device address.</td><td>Critical enumeration transition.</td></tr>
+        <tr><td>GET DESCRIPTOR</td><td>Reads a requested descriptor.</td><td>How the host learns device structure.</td></tr>
+        <tr><td>SET DESCRIPTOR</td><td>Writes a descriptor where supported.</td><td>Much less common in ordinary devices.</td></tr>
+        <tr><td>GET CONFIGURATION</td><td>Returns the current configuration value.</td><td>Checks device configuration state.</td></tr>
+        <tr><td>SET CONFIGURATION</td><td>Selects a configuration.</td><td>Moves an addressed device into configured operation.</td></tr>
+        <tr><td>GET INTERFACE</td><td>Returns the selected alternate setting.</td><td>Relevant when an interface has alternate settings.</td></tr>
+        <tr><td>SET INTERFACE</td><td>Selects an alternate interface setting.</td><td>Often used by streaming functions to switch endpoint arrangements.</td></tr>
+      </tbody></table></div>
+      <div class="ideaBox"><div class="calloutTitle">STACK DESIGN</div>Your class code should not need to reimplement the generic meaning of every standard request. A clean device core handles standard device behavior and dispatches class specific or vendor specific requests to the appropriate function layer.</div>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson29",
+    title: "28. Descriptor tree details and alternate settings",
+    body: `
+      <p>The configuration descriptor is the root of a contiguous descriptor tree. Its total length tells the host how many bytes belong to that complete configuration description. Interface descriptors identify functions. Endpoint descriptors describe communication channels. Class specific descriptors can appear where their class specification requires them.</p>
+      <figure class="diagram">
+        <div class="stackCol">
+          <div class="stackLayer accent">Configuration descriptor: total tree length, interface count, attributes, power information</div>
+          <div class="stackLayer">Interface 0, alternate setting 0</div>
+          <div class="stackLayer">Class specific descriptors for interface 0</div>
+          <div class="stackLayer">Endpoint descriptors belonging to interface 0 alternate setting 0</div>
+          <div class="stackLayer">Interface 0, alternate setting 1, possibly a different endpoint arrangement</div>
+          <div class="stackLayer">Interface 1 and its subordinate descriptors</div>
+        </div>
+      </figure>
+      <h3>Why alternate settings exist</h3>
+      <p>An interface number identifies one logical function. Alternate settings let that same function expose different endpoint sets or bandwidth choices without changing to a different configuration. This is especially useful for streaming classes.</p>
+      <div class="warningBox"><div class="calloutTitle">DESCRIPTOR INTEGRITY CHECK</div>The configuration total length, descriptor lengths, number of interfaces, endpoint counts, endpoint addresses, transfer attributes, and alternate setting relationships must agree with the actual bytes you return.</div>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson30",
+    title: "29. Reset, suspend, resume, and remote wakeup",
+    body: `
+      <p>USB devices must handle bus lifecycle events, not only normal data traffic. Reset reinitializes USB protocol state. Suspend reduces bus activity and changes power expectations. Resume returns communication to active operation. Some devices can request remote wakeup when the host has explicitly enabled that feature.</p>
+      <div class="flowRow"><span class="flowBox">Active</span><span class="flowArrow">→</span><span class="flowBox">Suspend condition</span><span class="flowArrow">→</span><span class="flowBox">Suspended</span><span class="flowArrow">→</span><span class="flowBox">Resume</span><span class="flowArrow">→</span><span class="flowBox">Active</span></div>
+      <div class="twoCol">
+        <div class="miniCard"><h3>Bus reset</h3><p>Reinitializes address and endpoint related protocol state according to the specification. Firmware must rebuild the correct endpoint zero and device state.</p></div>
+        <div class="miniCard"><h3>Suspend</h3><p>Your product may need to change clocks, PHY power, peripheral state, and application behavior while still meeting USB requirements.</p></div>
+        <div class="miniCard"><h3>Resume</h3><p>The link returns to active communication. Firmware must restore operational state cleanly.</p></div>
+        <div class="miniCard"><h3>Remote wakeup</h3><p>Only valid when the device supports it and the host has enabled the feature. It is not permission for arbitrary bus transmission.</p></div>
+      </div>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson31",
+    title: "30. Hubs, topology, and split transactions",
+    body: `
+      <p>Hubs are active USB devices. They report port status, detect attach and detach events, manage downstream port electrical state, and connect lower speed traffic into the host controlled topology.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 920 360" role="img" aria-label="USB host hub topology with mixed speeds">
+          <rect x="360" y="20" width="200" height="50" rx="13" class="svgBox accent"></rect><text x="460" y="51" text-anchor="middle" class="svgText strong">High Speed host</text>
+          <rect x="360" y="120" width="200" height="50" rx="13" class="svgBox"></rect><text x="460" y="151" text-anchor="middle" class="svgText strong">High Speed hub</text>
+          <rect x="70" y="260" width="200" height="50" rx="13" class="svgBox"></rect><text x="170" y="291" text-anchor="middle" class="svgText">Full Speed device</text>
+          <rect x="360" y="260" width="200" height="50" rx="13" class="svgBox"></rect><text x="460" y="291" text-anchor="middle" class="svgText">High Speed device</text>
+          <rect x="650" y="260" width="200" height="50" rx="13" class="svgBox"></rect><text x="750" y="291" text-anchor="middle" class="svgText">Low Speed device</text>
+          <path d="M460 70 V117 M420 170 L185 257 M460 170 V257 M500 170 L735 257" class="svgLine"></path>
+        </svg>
+      </figure>
+      <p>USB 2 High Speed hubs include transaction translator behavior so Full Speed and Low Speed transactions can coexist downstream without consuming the High Speed bus in the same way as a directly connected low speed signaling interval. The host uses split transaction protocol around this hub behavior.</p>
+      <div class="rememberBox"><div class="calloutTitle">TOPOLOGY LIMIT</div>USB device addresses are seven bits, so a single host controller bus can address at most 127 nonzero USB device addresses. Hubs themselves consume addresses.</div>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson32",
+    title: "31. Host transfer objects and asynchronous I O",
+    body: `
+      <p>Host applications rarely schedule packets directly. Software submits a transfer request object to an operating system or USB library. Linux commonly exposes the idea through URBs in kernel USB programming, while user libraries use their own transfer structures. The exact API differs, but the model is similar.</p>
+      <div class="flowRow"><span class="flowBox">Allocate request</span><span class="flowArrow">→</span><span class="flowBox">Choose device and endpoint</span><span class="flowArrow">→</span><span class="flowBox">Attach buffer</span><span class="flowArrow">→</span><span class="flowBox">Submit</span><span class="flowArrow">→</span><span class="flowBox">Completion callback or event</span></div>
+      <h3>Why asynchronous design matters</h3>
+      <p>USB timing belongs to the host controller, not to your application thread. Good host software submits work, lets the USB subsystem schedule it, and handles completion later. Blocking convenience APIs may exist, but they are usually built on this deeper asynchronous model.</p>
+      <div class="twoCol">
+        <div class="miniCard"><h3>Transfer status</h3><p>Completion tells software whether the requested data movement succeeded, timed out, stalled, disconnected, or ended with another controller or protocol status.</p></div>
+        <div class="miniCard"><h3>Actual length</h3><p>The amount transferred can be smaller than the buffer capacity. Correct code uses the reported actual length rather than assuming the entire buffer was filled.</p></div>
+      </div>`
+  },
+  {
+    group: "Deep dive",
+    id: "lesson33",
+    title: "32. Hardware and firmware bring up checklist",
+    body: `
+      <p>When you build your own USB microcontroller board, bring the design up in layers. This avoids wasting time debugging descriptors while the PHY has no clock or the data pair is routed incorrectly.</p>
+      <div class="timeline">
+        <div class="timelineStep"><div class="timelineIndex">1</div><div class="timelineBody"><b>Power and clock</b><span>Confirm the MCU supply, USB peripheral clock, PHY supply, reference clock requirements, and VBUS sensing scheme required by your controller.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">2</div><div class="timelineBody"><b>Board connectivity</b><span>Check connector pins, D plus and D minus continuity, orientation, ESD component placement, ground return, and absence of accidental swaps or shorts.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">3</div><div class="timelineBody"><b>Controller initialization</b><span>Enable clocks, configure pins and PHY, allocate packet memory or FIFO resources, and enable reset and setup events.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">4</div><div class="timelineBody"><b>Minimal endpoint zero</b><span>Before adding HID, CDC, or a vendor protocol, make standard control requests and a minimal descriptor set enumerate reliably.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">5</div><div class="timelineBody"><b>Add one function</b><span>Bring up one interface and its endpoints. Verify transfers before combining multiple functions.</span></div></div>
+        <div class="timelineStep"><div class="timelineIndex">6</div><div class="timelineBody"><b>Stress and lifecycle</b><span>Test repeated connect and disconnect, reset, suspend, resume, host reboot, cable changes, rapid transfers, short packets, error paths, and buffer boundaries.</span></div></div>
+      </div>
+      <div class="ideaBox"><div class="calloutTitle">BEST FIRST PROJECT</div>For a microcontroller, a Full Speed HID or CDC style device is usually a much better first implementation than starting with USB 3 or USB4. It teaches endpoint zero, descriptors, transfer direction, class behavior, buffers, and host interaction without the additional SuperSpeed link complexity.</div>`
+  },
+  {
+    group: "Debugging",
+    id: "lesson25",
+    title: "33. Debugging USB systematically",
+    body: `
+      <p>USB problems become manageable when you classify the failing layer instead of changing firmware randomly.</p>
+      <div class="tableWrap"><table><thead><tr><th>Symptom</th><th>First layer to inspect</th><th>Typical questions</th></tr></thead><tbody>
+        <tr><td>No attach detected</td><td>Power, cable, connector, PHY, pull behavior</td><td>Is VBUS present? Is the controller enabled? Is the data pair routed correctly?</td></tr>
+        <tr><td>Repeated resets or enumeration restart</td><td>Endpoint zero and descriptors</td><td>Is the setup state machine correct? Is bMaxPacketSize0 valid? Are descriptor lengths consistent?</td></tr>
+        <tr><td>Device appears but driver does not load</td><td>Class and descriptor identity</td><td>Are class codes and interfaces correct? Does the OS support this class combination?</td></tr>
+        <tr><td>Transfers stall</td><td>Endpoint state and request handling</td><td>Was the endpoint armed? Is STALL intentional? Did firmware requeue the next buffer?</td></tr>
+        <tr><td>Data corruption</td><td>Buffers, ownership, cache, packet framing, hardware integrity</td><td>Are buffer lengths correct? Is DMA cache maintenance required? Is the signal path sound?</td></tr>
+      </tbody></table></div>
+      <h3>Best debugging order</h3>
+      <div class="flowRow"><span class="flowBox">1 Physical attach</span><span class="flowArrow">→</span><span class="flowBox">2 Reset</span><span class="flowArrow">→</span><span class="flowBox">3 Endpoint zero</span><span class="flowArrow">→</span><span class="flowBox">4 Descriptors</span><span class="flowArrow">→</span><span class="flowBox">5 Class requests</span><span class="flowArrow">→</span><span class="flowBox">6 Data endpoints</span><span class="flowArrow">→</span><span class="flowBox">7 Application protocol</span></div>
+      <div class="twoCol">
+        <div class="miniCard"><h3>Software capture</h3><p>Host tools can show descriptors, driver binding, URBs or transfer requests, and some protocol activity depending on operating system and capture method.</p></div>
+        <div class="miniCard"><h3>Hardware analyzer</h3><p>A dedicated USB protocol analyzer can observe traffic on the wire and is invaluable for difficult enumeration, timing, handshake, and link problems.</p></div>
+      </div>
+      <h3>Final knowledge check</h3>
+      <div id="quizContainer"></div>`
+  }
+];
+
+const glossary = [
+  ["ACK", "Handshake meaning the preceding data transaction was accepted."],
+  ["Address", "Host assigned identifier used to target a USB device after enumeration progresses."],
+  ["Alternate setting", "An alternate endpoint arrangement for the same interface."],
+  ["Bulk transfer", "Reliable transfer type intended for data that can use available bandwidth without strict latency guarantees."],
+  ["Class", "Standardized device behavior such as HID, audio, CDC, storage, or DFU."],
+  ["Configuration", "A complete operating arrangement of interfaces and endpoints selected by the host."],
+  ["Control transfer", "Structured request transfer using endpoint zero and setup, optional data, and status stages."],
+  ["CRC", "Cyclic redundancy check used to detect transmission errors."],
+  ["DATA0 and DATA1", "Data packet identifiers used as part of USB 2 reliable sequencing and duplicate detection."],
+  ["Descriptor", "Structured bytes that tell the host how a USB device is organized and identified."],
+  ["Device", "A USB peripheral attached to a host through the bus topology."],
+  ["Device controller", "Hardware block implementing endpoint logic and USB peripheral protocol support."],
+  ["DFU", "Device Firmware Upgrade class specification for firmware update behavior."],
+  ["Endpoint", "Directional logical data source or sink inside a USB device."],
+  ["Endpoint zero", "Mandatory default control endpoint used for enumeration and standard requests."],
+  ["Enumeration", "Host process that discovers, addresses, describes, and configures an attached device."],
+  ["Frame", "USB scheduling time structure. In USB 2 Full Speed, frames occur at 1 ms intervals."],
+  ["Full Speed", "USB signaling rate of 12 Mbit/s."],
+  ["Handshake", "Packet indicating transaction outcome or flow state, such as ACK, NAK, or STALL."],
+  ["High Speed", "USB 2 signaling rate of 480 Mbit/s."],
+  ["HID", "Human Interface Device class, used by devices such as keyboards and mice and many custom control devices."],
+  ["Host", "The USB system that controls bus access, performs enumeration, and schedules transfers."],
+  ["Host controller", "Hardware that executes the host side USB schedule and bus transactions."],
+  ["Hub", "USB device that expands one upstream connection into multiple downstream ports."],
+  ["IN", "Direction from device to host."],
+  ["Interface", "Logical USB function or portion of a function within a configuration."],
+  ["Interrupt transfer", "Reliable scheduled transfer type used for small periodic or latency sensitive data."],
+  ["Isochronous transfer", "Time sensitive transfer type that favors timely delivery over retransmission."],
+  ["Low Speed", "USB signaling rate of 1.5 Mbit/s."],
+  ["Microframe", "125 microsecond scheduling interval used in USB 2 High Speed timing."],
+  ["NAK", "Handshake commonly indicating that an endpoint is temporarily unable to send or receive requested data."],
+  ["OUT", "Direction from host to device."],
+  ["Packet", "A formatted unit transmitted on the USB bus."],
+  ["PHY", "Physical layer circuitry that sends and receives electrical signaling."],
+  ["PID", "Packet identifier field specifying packet type and related information."],
+  ["SETUP", "Special token and transaction used to begin a control transfer request."],
+  ["SOF", "Start Of Frame packet used in USB timing and synchronization."],
+  ["STALL", "Handshake indicating that an endpoint cannot complete the requested operation in its current state."],
+  ["SuperSpeed", "USB 3 architecture performance level beginning at 5 Gbit/s."],
+  ["Token", "Packet used by the host to initiate or identify a USB transaction."],
+  ["Transaction", "Small protocol exchange composed of token, optional data, and handshake behavior depending on transaction type."],
+  ["Transfer", "Higher level data movement requested by software and implemented through one or more bus transactions."],
+  ["Type C", "Reversible USB connector system with configuration channel behavior and support for multiple data and power capabilities."],
+  ["USB Power Delivery", "Negotiated power protocol used with compatible USB Type C connections."],
+  ["Vendor ID", "Identifier assigned for USB product identification purposes."],
+  ["Vendor specific", "Class or protocol behavior defined by a vendor rather than a standard USB device class."],
+  ["xHCI", "Extensible Host Controller Interface architecture widely used for modern USB host controllers."]
+];
+
+const quiz = [
+  {q:"Who schedules normal USB 2 bus transactions?", a:["The peripheral whenever it wants", "The host", "The cable", "The application"], c:1, e:"USB 2 is host controlled. The host controller schedules bus activity."},
+  {q:"What does endpoint 1 IN mean?", a:["Host sends data to device endpoint 1", "Device sends data to host from endpoint 1", "Endpoint is bidirectional", "Endpoint is only for setup packets"], c:1, e:"Direction is named from the host perspective. IN means into the host."},
+  {q:"Which endpoint always exists?", a:["Endpoint 1 IN", "Endpoint 15 OUT", "Endpoint 0 control", "Isochronous endpoint 0"], c:2, e:"Endpoint zero is the mandatory default control endpoint."},
+  {q:"Which transfer type normally gives up retransmission to preserve timing?", a:["Control", "Bulk", "Interrupt", "Isochronous"], c:3, e:"Isochronous traffic prioritizes timely delivery and reserved scheduling over retry."},
+  {q:"What is a descriptor?", a:["An electrical waveform", "Structured bytes describing the device", "A physical connector", "A host controller register"], c:1, e:"Descriptors are structured byte records used during discovery and configuration."},
+  {q:"What does NAK usually mean?", a:["Permanent hardware failure", "Endpoint temporarily not ready", "CRC always passed", "Device has disconnected"], c:1, e:"NAK is ordinary flow control in many transfer situations."},
+  {q:"Which is the correct scale order?", a:["Packet contains transfer contains transaction", "Transfer contains transaction contains packet", "Transaction contains transfer contains packet", "Descriptor contains PHY contains transfer"], c:1, e:"A transfer is implemented through transactions, which are built from packets."},
+  {q:"Does a Type C connector guarantee USB4?", a:["Yes", "No"], c:1, e:"Type C is a connector system. Actual data capability depends on the host, device, and cable."}
+];
+
+const course = document.getElementById("course");
+const nav = document.getElementById("lessonNav");
+const completed = new Set(JSON.parse(localStorage.getItem("usbCourseProgress") || "[]"));
+
+function lessonTemplate(lesson) {
+  return `<section class="lesson card" id="${lesson.id}" data-title="${lesson.title.toLowerCase()}" data-group="${lesson.group.toLowerCase()}">
+    <div class="lessonHeader">
+      <div><span class="lessonNumber">${lesson.group.toUpperCase()}</span><h2>${lesson.title}</h2></div>
+      <button type="button" class="completeButton ${completed.has(lesson.id) ? "done" : ""}" data-complete="${lesson.id}">${completed.has(lesson.id) ? "Completed" : "Mark complete"}</button>
+    </div>
+    ${lesson.body}
+  </section>`;
+}
+
+course.innerHTML = lessons.map(lessonTemplate).join("");
+
+function renderNav() {
+  let currentGroup = "";
+  let html = "";
+  lessons.forEach(lesson => {
+    if (lesson.group !== currentGroup) {
+      currentGroup = lesson.group;
+      html += `<div class="navGroup">${currentGroup}</div>`;
+    }
+    html += `<button type="button" class="navLink ${completed.has(lesson.id) ? "done" : ""}" data-target="${lesson.id}" data-search="${lesson.title.toLowerCase()} ${lesson.group.toLowerCase()}"><span class="navDot"></span><span>${lesson.title}</span></button>`;
+  });
+  html += `<div class="navGroup">Reference</div><button type="button" class="navLink" data-target="glossarySection" data-search="glossary reference"><span class="navDot"></span><span>Glossary</span></button>`;
+  html += `<button type="button" class="navLink" data-target="sourcesSection" data-search="sources specification reference"><span class="navDot"></span><span>Primary sources</span></button>`;
+  nav.innerHTML = html;
+  nav.querySelectorAll("[data-target]").forEach(button => button.addEventListener("click", () => {
+    document.getElementById(button.dataset.target).scrollIntoView({behavior:"smooth"});
+    document.getElementById("sidebar").classList.remove("open");
+  }));
+}
+
+function updateProgress() {
+  const percent = Math.round((completed.size / lessons.length) * 100);
+  document.getElementById("progressText").textContent = `${percent}%`;
+  document.getElementById("progressFill").style.width = `${percent}%`;
+  localStorage.setItem("usbCourseProgress", JSON.stringify([...completed]));
+  renderNav();
+}
+
+course.addEventListener("click", event => {
+  const button = event.target.closest("[data-complete]");
+  if (!button) return;
+  const id = button.dataset.complete;
+  if (completed.has(id)) completed.delete(id); else completed.add(id);
+  button.classList.toggle("done", completed.has(id));
+  button.textContent = completed.has(id) ? "Completed" : "Mark complete";
+  updateProgress();
+});
+
+renderNav();
+updateProgress();
+
+document.getElementById("startButton").addEventListener("click", () => document.getElementById("lesson1").scrollIntoView({behavior:"smooth"}));
+document.getElementById("continueButton").addEventListener("click", () => {
+  const next = lessons.find(l => !completed.has(l.id)) || lessons[0];
+  document.getElementById(next.id).scrollIntoView({behavior:"smooth"});
+});
+
+document.getElementById("resetProgress").addEventListener("click", () => {
+  completed.clear();
+  document.querySelectorAll("[data-complete]").forEach(b => { b.classList.remove("done"); b.textContent = "Mark complete"; });
+  updateProgress();
+});
+
+const sidebar = document.getElementById("sidebar");
+document.getElementById("menuButton").addEventListener("click", () => sidebar.classList.toggle("open"));
+
+function setTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("usbTheme", theme);
+}
+const initialTheme = localStorage.getItem("usbTheme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+setTheme(initialTheme);
+function toggleTheme() { setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"); }
+document.getElementById("themeButton").addEventListener("click", toggleTheme);
+document.getElementById("mobileThemeButton").addEventListener("click", toggleTheme);
+
+const lessonSearch = document.getElementById("lessonSearch");
+lessonSearch.addEventListener("input", () => {
+  const q = lessonSearch.value.trim().toLowerCase();
+  document.querySelectorAll("#course .lesson").forEach(section => {
+    section.classList.toggle("hiddenBySearch", q && !section.textContent.toLowerCase().includes(q));
+  });
+  nav.querySelectorAll(".navLink").forEach(link => link.style.display = !q || link.dataset.search.includes(q) ? "flex" : "none");
+});
+
+const enumStages = [
+  ["ATTACH", "Device connection is detected", "The host notices a new device on a downstream port and begins connection handling."],
+  ["RESET", "Port reset establishes initial USB state", "The device returns to its default protocol state and endpoint zero becomes the communication path for enumeration."],
+  ["EP0", "Host starts control requests", "The host uses endpoint zero at the default address to learn enough information to continue."],
+  ["ADDRESS", "Host assigns a unique USB address", "A SET ADDRESS control request changes how future transactions target this device."],
+  ["DESCRIPTORS", "Host reads the descriptor hierarchy", "The host learns configurations, interfaces, endpoints, class identity, and other capabilities."],
+  ["DRIVER", "Operating system matches software support", "The OS chooses class drivers or another driver path based on descriptors and policy."],
+  ["CONFIGURE", "Host selects a configuration", "A SET CONFIGURATION request moves the device into configured operation and function endpoints can be used."]
+];
+let enumIndex = 0;
+function renderEnum() {
+  const stage = enumStages[enumIndex];
+  document.getElementById("enumStage").innerHTML = `<div class="enumMeta">STEP ${enumIndex + 1} OF ${enumStages.length} · ${stage[0]}</div><h4>${stage[1]}</h4><p>${stage[2]}</p>`;
+}
+document.getElementById("enumPrev").addEventListener("click", () => { enumIndex = Math.max(0, enumIndex - 1); renderEnum(); });
+document.getElementById("enumNext").addEventListener("click", () => { enumIndex = Math.min(enumStages.length - 1, enumIndex + 1); renderEnum(); });
+document.getElementById("enumReset").addEventListener("click", () => { enumIndex = 0; renderEnum(); });
+renderEnum();
+
+function updateRequestBuilder() {
+  const value = Number(document.getElementById("reqDirection").value) | Number(document.getElementById("reqType").value) | Number(document.getElementById("reqRecipient").value);
+  const hex = value.toString(16).toUpperCase().padStart(2, "0");
+  const bits = value.toString(2).padStart(8, "0");
+  document.getElementById("requestResult").textContent = `bmRequestType = 0x${hex} = ${bits}b`;
+}
+["reqDirection", "reqType", "reqRecipient"].forEach(id => document.getElementById(id).addEventListener("change", updateRequestBuilder));
+updateRequestBuilder();
+
+function renderGlossary(filter = "") {
+  const q = filter.toLowerCase().trim();
+  const matches = glossary.filter(([term, def]) => `${term} ${def}`.toLowerCase().includes(q));
+  document.getElementById("glossaryGrid").innerHTML = matches.map(([term, def]) => `<div class="glossaryItem"><b>${term}</b><span>${def}</span></div>`).join("");
+}
+renderGlossary();
+document.getElementById("glossarySearch").addEventListener("input", e => renderGlossary(e.target.value));
+
+function renderQuiz() {
+  document.getElementById("quizContainer").innerHTML = quiz.map((item, qi) => `<div class="quizQuestion" data-q="${qi}"><h4>${qi + 1}. ${item.q}</h4><div class="choices">${item.a.map((choice, ai) => `<button type="button" class="choiceButton" data-answer="${ai}">${choice}</button>`).join("")}</div><div class="quizFeedback"></div></div>`).join("");
+}
+renderQuiz();
+document.getElementById("quizContainer").addEventListener("click", event => {
+  const button = event.target.closest("[data-answer]");
+  if (!button) return;
+  const qEl = button.closest(".quizQuestion");
+  const item = quiz[Number(qEl.dataset.q)];
+  qEl.querySelectorAll(".choiceButton").forEach((b, i) => {
+    b.disabled = true;
+    if (i === item.c) b.classList.add("correct");
+  });
+  if (Number(button.dataset.answer) !== item.c) button.classList.add("wrong");
+  qEl.querySelector(".quizFeedback").textContent = item.e;
+});
+
+const observer = new IntersectionObserver(entries => {
+  const visible = entries.filter(e => e.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+  if (!visible) return;
+  document.querySelectorAll(".navLink").forEach(link => link.classList.toggle("active", link.dataset.target === visible.target.id));
+}, {threshold:[0.15,0.35,0.65], rootMargin:"-10% 0px -65% 0px"});
+
+document.querySelectorAll(".lesson").forEach(section => observer.observe(section));
+
+</script>
+</body>
+</html>
